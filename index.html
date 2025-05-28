@@ -80,6 +80,11 @@
   <script>
     let chart;
 
+    function calculate() {
+      const profit = calculatePatientsProfit(+document.getElementById('patients').value);
+      document.getElementById('output').innerText = `Estimated Annual Profit: $${profit.toLocaleString()}`;
+    }
+
     function calculatePatientsProfit(patientsPerDay, gpPercent = null, feeOverride = null, doctorsOverride = null, daysOverride = null, weeksOverride = null, incentivesOverride = null) {
       const doctors = doctorsOverride !== null ? doctorsOverride : +document.getElementById('doctors').value;
       const weeks = weeksOverride !== null ? weeksOverride : +document.getElementById('weeks').value;
@@ -125,6 +130,50 @@
       return profitBeforeTax - tax;
     }
 
+    function renderChart(labels, data, label, xlabel) {
+      const ctx = document.getElementById('profitChart').getContext('2d');
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label,
+            data,
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 2,
+            fill: false
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: true
+            },
+            title: {
+              display: true,
+              text: label
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: xlabel
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Profit ($)'
+              }
+            }
+          }
+        }
+      });
+    }
+
     function graphProfitVsDaysPerWeek() {
       const labels = [];
       const data = [];
@@ -154,9 +203,6 @@
       }
       renderChart(labels, data, 'Estimated Annual Profit vs Incentive Revenue', 'Total PIP + WIP Incentive ($)');
     }
-
-    // Existing graph functions & calculate() remain unchanged
-    // ... (unchanged code is retained here)
   </script>
 </body>
 </html>
