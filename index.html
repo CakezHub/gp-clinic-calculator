@@ -55,17 +55,20 @@
 
   <button onclick="calculate()">Calculate</button>
   <button onclick="graphProfitVsPatients()">Graph Profit vs Patients/Day</button>
+  <button onclick="graphProfitVsGPShare()">Graph Profit vs GP % Share</button>
 
   <div class="result" id="output"></div>
   <canvas id="profitChart" width="800" height="400"></canvas>
 
   <script>
-    function calculatePatientsProfit(patientsPerDay) {
+    let chart;
+
+    function calculatePatientsProfit(patientsPerDay, gpPercent = null) {
       const doctors = +document.getElementById('doctors').value;
       const weeks = +document.getElementById('weeks').value;
       const days = +document.getElementById('days').value;
       const fee = +document.getElementById('fee').value;
-      const gpShare = +document.getElementById('gpShare').value / 100;
+      const gpShare = gpPercent !== null ? gpPercent / 100 : +document.getElementById('gpShare').value / 100;
 
       const consults = doctors * patientsPerDay * weeks * days;
       const totalRevenue = consults * fee;
@@ -109,7 +112,7 @@
       document.getElementById('output').innerHTML = `
         <strong>Total Consults:</strong> ${consults.toLocaleString()}<br>
         <strong>Total Revenue:</strong> $${totalRevenue.toLocaleString()}<br>
-        <strong>GP Payouts (65%):</strong> $${gpPayout.toLocaleString()}<br>
+        <strong>GP Payouts (${(gpShare * 100).toFixed(0)}%):</strong> $${gpPayout.toLocaleString()}<br>
         <strong>Clinic Share:</strong> $${clinicShare.toLocaleString()}<br>
         <strong>Total Expenses:</strong> $${expenses.toLocaleString()}<br>
         <strong><u>Estimated Annual Profit:</u></strong> <strong>$${profit.toLocaleString()}</strong>
@@ -124,8 +127,27 @@
         data.push(calculatePatientsProfit(i));
       }
 
+      renderChart(labels, data, 'Estimated Annual Profit vs Patients per Doctor per Day', 'Patients per Doctor per Day');
+    }
+
+    function graphProfitVsGPShare() {
+      const patients = +document.getElementById('patients').value;
+      const labels = [];
+      const data = [];
+      for (let i = 40; i <= 85; i += 1) {
+        labels.push(i);
+        data.push(calculatePatientsProfit(patients, i));
+      }
+
+      renderChart(labels, data, 'Estimated Annual Profit vs GP Percentage of Billing', 'GP % Share');
+    }
+
+    function renderChart(labels, data, title, xlabel) {
       const ctx = document.getElementById('profitChart').getContext('2d');
-      new Chart(ctx, {
+      if (chart) {
+        chart.destroy();
+      }
+      chart = new Chart(ctx, {
         type: 'line',
         data: {
           labels: labels,
@@ -147,14 +169,14 @@
             },
             title: {
               display: true,
-              text: 'Estimated Annual Profit vs Patients per Doctor per Day'
+              text: title
             }
           },
           scales: {
             x: {
               title: {
                 display: true,
-                text: 'Patients per Doctor per Day'
+                text: xlabel
               }
             },
             y: {
