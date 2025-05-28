@@ -174,6 +174,46 @@
       });
     }
 
+    function graphProfitVsPatients() {
+      const labels = [];
+      const data = [];
+      for (let p = 10; p <= 60; p += 2) {
+        labels.push(p);
+        data.push(calculatePatientsProfit(p));
+      }
+      renderChart(labels, data, 'Estimated Annual Profit vs Patients per Doctor per Day', 'Patients per Doctor per Day');
+    }
+
+    function graphProfitVsGPShare() {
+      const labels = [];
+      const data = [];
+      for (let gp = 50; gp <= 80; gp++) {
+        labels.push(gp);
+        data.push(calculatePatientsProfit(+document.getElementById('patients').value, gp));
+      }
+      renderChart(labels, data, 'Estimated Annual Profit vs GP % Share', 'GP % Share');
+    }
+
+    function graphProfitVsFee() {
+      const labels = [];
+      const data = [];
+      for (let f = 50; f <= 100; f++) {
+        labels.push(f);
+        data.push(calculatePatientsProfit(+document.getElementById('patients').value, null, f));
+      }
+      renderChart(labels, data, 'Estimated Annual Profit vs Fee per Consult', 'Fee per Consult ($)');
+    }
+
+    function graphProfitVsDoctors() {
+      const labels = [];
+      const data = [];
+      for (let d = 1; d <= 10; d++) {
+        labels.push(d);
+        data.push(calculatePatientsProfit(+document.getElementById('patients').value, null, null, d));
+      }
+      renderChart(labels, data, 'Estimated Annual Profit vs Number of Doctors', 'Number of Doctors');
+    }
+
     function graphProfitVsDaysPerWeek() {
       const labels = [];
       const data = [];
