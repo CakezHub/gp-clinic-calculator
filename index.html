@@ -130,7 +130,7 @@
         data: {
           labels: labels,
           datasets: [{
-            label: 'Annual Profit vs Patients/Doctor/Day',
+            label: 'Annual Profit',
             data: data,
             borderColor: 'rgba(0, 123, 255, 1)',
             backgroundColor: 'rgba(0, 123, 255, 0.1)',
@@ -142,11 +142,26 @@
           responsive: true,
           plugins: {
             legend: {
+              display: true,
               position: 'top'
             },
             title: {
               display: true,
-              text: 'Estimated Annual Profit vs Patients/Doctor/Day'
+              text: 'Estimated Annual Profit vs Patients per Doctor per Day'
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Patients per Doctor per Day'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Estimated Annual Profit ($)'
+              }
             }
           }
         }
