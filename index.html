@@ -88,6 +88,38 @@
   <script>
     let chart;
 
+    function calculatePatientsProfit(patients, weeksOverride = null, daysOverride = null, doctorsOverride = null, feeOverride = null, gpPercent = null, gpOverride = null, expensesOnly = false) {
+      const getVal = id => +document.getElementById(id).value || 0;
+      const doctors = doctorsOverride !== null ? doctorsOverride : getVal('doctors');
+      const weeks = weeksOverride !== null ? weeksOverride : getVal('weeks');
+      const days = daysOverride !== null ? daysOverride : getVal('days');
+      const fee = feeOverride !== null ? feeOverride : getVal('fee');
+      const gpShare = gpPercent !== null ? gpPercent / 100 : getVal('gpShare') / 100;
+
+      const consults = doctors * days * weeks * patients;
+      const revenue = consults * fee;
+      const pip = getVal('pip');
+      const wip = getVal('wip');
+
+      const totalRevenue = revenue + pip + wip;
+      const gpPayments = revenue * gpShare;
+
+      const nurse = getVal('nurse');
+      const receptionist = getVal('receptionist');
+      const manager = getVal('manager');
+
+      const superannuation = (nurse + receptionist + manager) * 0.11;
+
+      const expenses = gpPayments
+        + nurse + receptionist + manager + superannuation
+        + getVal('rent') + getVal('supplies') + getVal('it')
+        + getVal('insurance') + getVal('marketing')
+        + getVal('seo') + getVal('web') + getVal('google') + getVal('facebook')
+        + getVal('cleaning') + getVal('accounting') + getVal('legal') + getVal('accreditation');
+
+      return expensesOnly ? expenses : totalRevenue - expenses;
+    }
+
     function calculate() {
       const profit = calculatePatientsProfit(+document.getElementById('patients').value);
       const doctors = +document.getElementById('doctors').value;
@@ -114,7 +146,6 @@
         <strong>Operational Expenses:</strong> $${expenses.toLocaleString()}
       `;
     }
-    // All other JS functions remain unchanged...
   </script>
 </body>
 </html>
