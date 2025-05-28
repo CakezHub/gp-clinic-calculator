@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GP Clinic Financial Calculator</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f5f9fa;
+      color: #333;
+    }
+    label, input {
+      display: block;
+      margin: 10px 0;
+    }
+    input[type="number"] {
+      width: 100px;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 20px;
+      background-color: #e1f5fe;
+      border: 1px solid #81d4fa;
+    }
+    canvas {
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <h1>GP Clinic Financial Calculator</h1>
+
+  <label>Doctors: <input type="number" id="doctors" value="2"></label>
+  <label>Patients per Doctor per Day: <input type="number" id="patients" value="35"></label>
+  <label>Working Weeks per Year: <input type="number" id="weeks" value="48"></label>
+  <label>Work Days per Week: <input type="number" id="days" value="5"></label>
+  <label>Avg Fee per Consult ($): <input type="number" id="fee" value="78"></label>
+  <label>GP Percentage of Billing (%): <input type="number" id="gpShare" value="65"></label>
+  <label>Nurse Salary ($): <input type="number" id="nurse" value="85000"></label>
+  <label>Receptionist Salary ($): <input type="number" id="receptionist" value="60000"></label>
+  <label>Practice Manager Salary ($): <input type="number" id="manager" value="95000"></label>
+  <label>Rent & Utilities ($): <input type="number" id="rent" value="100000"></label>
+  <label>Medical Supplies ($): <input type="number" id="supplies" value="40000"></label>
+  <label>IT & Software ($): <input type="number" id="it" value="15000"></label>
+  <label>Insurance & Compliance ($): <input type="number" id="insurance" value="20000"></label>
+  <label>Marketing/Admin ($): <input type="number" id="marketing" value="10000"></label>
+  <label>SEO ($): <input type="number" id="seo" value="6000"></label>
+  <label>Website Maintenance ($): <input type="number" id="web" value="3000"></label>
+  <label>Google Ads ($): <input type="number" id="google" value="6000"></label>
+  <label>Facebook Ads ($): <input type="number" id="facebook" value="3000"></label>
+  <label>Maintenance & Cleaning ($): <input type="number" id="cleaning" value="24000"></label>
+
+  <button onclick="calculate()">Calculate</button>
+  <button onclick="graphProfitVsPatients()">Graph Profit vs Patients/Day</button>
+
+  <div class="result" id="output"></div>
+  <canvas id="profitChart" width="800" height="400"></canvas>
+
+  <script>
+    function calculatePatientsProfit(patientsPerDay) {
+      const doctors = +document.getElementById('doctors').value;
+      const weeks = +document.getElementById('weeks').value;
+      const days = +document.getElementById('days').value;
+      const fee = +document.getElementById('fee').value;
+      const gpShare = +document.getElementById('gpShare').value / 100;
+
+      const consults = doctors * patientsPerDay * weeks * days;
+      const totalRevenue = consults * fee;
+      const gpPayout = totalRevenue * gpShare;
+
+      const expenses = gpPayout
+        + +document.getElementById('nurse').value
+        + +document.getElementById('receptionist').value
+        + +document.getElementById('manager').value
+        + +document.getElementById('rent').value
+        + +document.getElementById('supplies').value
+        + +document.getElementById('it').value
+        + +document.getElementById('insurance').value
+        + +document.getElementById('marketing').value
+        + +document.getElementById('seo').value
+        + +document.getElementById('web').value
+        + +document.getElementById('google').value
+        + +document.getElementById('facebook').value
+        + +document.getElementById('cleaning').value;
+
+      return totalRevenue - expenses;
+    }
+
+    function calculate() {
+      const patients = +document.getElementById('patients').value;
+      const profit = calculatePatientsProfit(patients);
+
+      const doctors = +document.getElementById('doctors').value;
+      const weeks = +document.getElementById('weeks').value;
+      const days = +document.getElementById('days').value;
+      const fee = +document.getElementById('fee').value;
+      const gpShare = +document.getElementById('gpShare').value / 100;
+
+      const consults = doctors * patients * weeks * days;
+      const totalRevenue = consults * fee;
+      const gpPayout = totalRevenue * gpShare;
+      const clinicShare = totalRevenue - gpPayout;
+
+      const expenses = totalRevenue - clinicShare;
+
+      document.getElementById('output').innerHTML = `
+        <strong>Total Consults:</strong> ${consults.toLocaleString()}<br>
+        <strong>Total Revenue:</strong> $${totalRevenue.toLocaleString()}<br>
+        <strong>GP Payouts (65%):</strong> $${gpPayout.toLocaleString()}<br>
+        <strong>Clinic Share:</strong> $${clinicShare.toLocaleString()}<br>
+        <strong>Total Expenses:</strong> $${expenses.toLocaleString()}<br>
+        <strong><u>Estimated Annual Profit:</u></strong> <strong>$${profit.toLocaleString()}</strong>
+      `;
+    }
+
+    function graphProfitVsPatients() {
+      const labels = [];
+      const data = [];
+      for (let i = 10; i <= 60; i += 2) {
+        labels.push(i);
+        data.push(calculatePatientsProfit(i));
+      }
+
+      const ctx = document.getElementById('profitChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Annual Profit vs Patients/Doctor/Day',
+            data: data,
+            borderColor: 'rgba(0, 123, 255, 1)',
+            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+            fill: true,
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top'
+            },
+            title: {
+              display: true,
+              text: 'Estimated Annual Profit vs Patients/Doctor/Day'
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
