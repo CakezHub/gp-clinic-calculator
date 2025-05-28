@@ -54,6 +54,8 @@
   <label>Maintenance & Cleaning ($): <input type="number" id="cleaning" value="24000"></label>
   <label>Accounting & Bookkeeping ($): <input type="number" id="accounting" value="12000"></label>
   <label>Legal Fees ($): <input type="number" id="legal" value="8000"></label>
+  <label>RACGP Accreditation Cost ($): <input type="number" id="accreditation" value="3000"></label>
+  <label>PIP & WIP Incentive Revenue ($): <input type="number" id="pipwip" value="25000"></label>
 
   <button onclick="calculate()">Calculate</button>
   <button onclick="graphProfitVsPatients()">Graph Profit vs Patients/Day</button>
@@ -73,10 +75,11 @@
       const days = +document.getElementById('days').value;
       const fee = feeOverride !== null ? feeOverride : +document.getElementById('fee').value;
       const gpShare = gpPercent !== null ? gpPercent / 100 : +document.getElementById('gpShare').value / 100;
+      const incentive = +document.getElementById('pipwip').value;
 
       const consults = doctors * patientsPerDay * weeks * days;
-      const totalRevenue = consults * fee;
-      const gpPayout = totalRevenue * gpShare;
+      const totalRevenue = consults * fee + incentive;
+      const gpPayout = consults * fee * gpShare;
 
       const expenses = gpPayout
         + +document.getElementById('nurse').value
@@ -93,7 +96,8 @@
         + +document.getElementById('facebook').value
         + +document.getElementById('cleaning').value
         + +document.getElementById('accounting').value
-        + +document.getElementById('legal').value;
+        + +document.getElementById('legal').value
+        + +document.getElementById('accreditation').value;
 
       const profitBeforeTax = totalRevenue - expenses;
       const tax = profitBeforeTax > 0 ? profitBeforeTax * 0.25 : 0; // assume flat 25% tax
@@ -109,17 +113,18 @@
       const days = +document.getElementById('days').value;
       const fee = +document.getElementById('fee').value;
       const gpShare = +document.getElementById('gpShare').value / 100;
+      const incentive = +document.getElementById('pipwip').value;
 
       const consults = doctors * patients * weeks * days;
-      const totalRevenue = consults * fee;
-      const gpPayout = totalRevenue * gpShare;
+      const totalRevenue = consults * fee + incentive;
+      const gpPayout = consults * fee * gpShare;
       const clinicShare = totalRevenue - gpPayout;
 
       const expenses = totalRevenue - clinicShare;
 
       document.getElementById('output').innerHTML = `
         <strong>Total Consults:</strong> ${consults.toLocaleString()}<br>
-        <strong>Total Revenue:</strong> $${totalRevenue.toLocaleString()}<br>
+        <strong>Total Revenue (incl. PIP/WIP):</strong> $${totalRevenue.toLocaleString()}<br>
         <strong>GP Payouts (${(gpShare * 100).toFixed(0)}%):</strong> $${gpPayout.toLocaleString()}<br>
         <strong>Clinic Share:</strong> $${clinicShare.toLocaleString()}<br>
         <strong>Total Expenses:</strong> $${expenses.toLocaleString()}<br>
