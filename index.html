@@ -52,10 +52,12 @@
   <label>Google Ads ($): <input type="number" id="google" value="6000"></label>
   <label>Facebook Ads ($): <input type="number" id="facebook" value="3000"></label>
   <label>Maintenance & Cleaning ($): <input type="number" id="cleaning" value="24000"></label>
+  <label>Accounting & Bookkeeping ($): <input type="number" id="accounting" value="12000"></label>
 
   <button onclick="calculate()">Calculate</button>
   <button onclick="graphProfitVsPatients()">Graph Profit vs Patients/Day</button>
   <button onclick="graphProfitVsGPShare()">Graph Profit vs GP % Share</button>
+  <button onclick="graphProfitVsFee()">Graph Profit vs Fee per Consult</button>
 
   <div class="result" id="output"></div>
   <canvas id="profitChart" width="800" height="400"></canvas>
@@ -63,11 +65,11 @@
   <script>
     let chart;
 
-    function calculatePatientsProfit(patientsPerDay, gpPercent = null) {
+    function calculatePatientsProfit(patientsPerDay, gpPercent = null, feeOverride = null) {
       const doctors = +document.getElementById('doctors').value;
       const weeks = +document.getElementById('weeks').value;
       const days = +document.getElementById('days').value;
-      const fee = +document.getElementById('fee').value;
+      const fee = feeOverride !== null ? feeOverride : +document.getElementById('fee').value;
       const gpShare = gpPercent !== null ? gpPercent / 100 : +document.getElementById('gpShare').value / 100;
 
       const consults = doctors * patientsPerDay * weeks * days;
@@ -87,7 +89,8 @@
         + +document.getElementById('web').value
         + +document.getElementById('google').value
         + +document.getElementById('facebook').value
-        + +document.getElementById('cleaning').value;
+        + +document.getElementById('cleaning').value
+        + +document.getElementById('accounting').value;
 
       return totalRevenue - expenses;
     }
@@ -126,7 +129,6 @@
         labels.push(i);
         data.push(calculatePatientsProfit(i));
       }
-
       renderChart(labels, data, 'Estimated Annual Profit vs Patients per Doctor per Day', 'Patients per Doctor per Day');
     }
 
@@ -138,8 +140,18 @@
         labels.push(i);
         data.push(calculatePatientsProfit(patients, i));
       }
-
       renderChart(labels, data, 'Estimated Annual Profit vs GP Percentage of Billing', 'GP % Share');
+    }
+
+    function graphProfitVsFee() {
+      const patients = +document.getElementById('patients').value;
+      const labels = [];
+      const data = [];
+      for (let i = 50; i <= 120; i += 2) {
+        labels.push(i);
+        data.push(calculatePatientsProfit(patients, null, i));
+      }
+      renderChart(labels, data, 'Estimated Annual Profit vs Fee per Consult', 'Fee per Consult ($)');
     }
 
     function renderChart(labels, data, title, xlabel) {
